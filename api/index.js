@@ -51,28 +51,39 @@ app.get('/api/gallery', async (req, res) => {
     }
 });
 
-// API Endpoint to upload an image (protected)
-app.post('/api/upload', checkAuth, upload.single('photo'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
+// API Endpoint to upload multiple images (protected)
+app.post('/api/upload', checkAuth, upload.array('photos', 50), async (req, res) => {
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: 'No files uploaded' });
     }
     
-    // Upload buffer to Cloudinary
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const publicId = 'img-' + uniqueSuffix;
-    
-    const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'jagran_gallery', public_id: publicId },
-        (error, result) => {
-            if (error) {
-                console.error('Cloudinary Upload Error:', error);
-                return res.status(500).json({ error: 'Failed to upload photo' });
-            }
-            res.json({ message: 'Photo uploaded successfully!', file: result.secure_url });
-        }
-    );
-    
-    streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+    try {
+        const uploadPromises = req.files.map(file => {
+            return new Promise((resolve, reject) => {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                const publicId = 'img-' + uniqueSuffix;
+                
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    { folder: 'jagran_gallery', public_id: publicId },
+                    (error, result) => {
+                        if (error) {
+                            console.error('Cloudinary Upload Error:', error);
+                            return reject(error);
+                        }
+                        resolve(result.secure_url);
+                    }
+                );
+                
+                streamifier.createReadStream(file.buffer).pipe(uploadStream);
+            });
+        });
+
+        const urls = await Promise.all(uploadPromises);
+        res.json({ message: `${urls.length} photo(s) uploaded successfully!`, files: urls });
+    } catch (error) {
+        console.error('Cloudinary Bulk Upload Error:', error);
+        res.status(500).json({ error: 'Failed to upload one or more photos' });
+    }
 });
 
 // API Endpoint to delete an image (protected)
