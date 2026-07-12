@@ -518,7 +518,7 @@
                             <div class="form-group">
                                 <label for="eventDate">कार्यक्रम की तारीख *</label>
                                 <input type="date" id="eventDate" required>
-                                <button type="button" class="btn-check-avail" onclick="checkAvailability()">🔍 Check Availability</button>
+                                <button type="button" class="btn-check-avail" onclick="checkAvailability('eventDate', 'availabilityResult')">🔍 Check Availability</button>
                                 <div id="availabilityResult" class="availability-result" style="display:none;"></div>
                             </div>
                             <div class="form-group">
@@ -963,7 +963,7 @@
             </div>
             <div class="date-checker-right">
                 <input type="date" id="checkDate" class="dc-input" min="">
-                <button class="dc-btn" onclick="checkAvailability()">
+                <button class="dc-btn" onclick="checkAvailability('checkDate', 'availResult')">
                     <i class="fas fa-search"></i> Check Now
                 </button>
             </div>

@@ -882,9 +882,9 @@ console.log('%cPushpendra Madhosh | Sankirtan Booking Website v2.0', 'color: #FF
 })();
 
 // --- CHECK AVAILABILITY FUNCTION ---
-window.checkAvailability = function() {
-    const dateInput = document.getElementById('eventDate');
-    const resultDiv = document.getElementById('availabilityResult');
+window.checkAvailability = function(inputId, resultId) {
+    const dateInput = document.getElementById(inputId || 'eventDate');
+    const resultDiv = document.getElementById(resultId || 'availabilityResult');
     
     if (!dateInput.value) {
         resultDiv.className = 'availability-result avail-error';
