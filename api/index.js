@@ -15,8 +15,8 @@ app.use(express.json());
 // Configure Cloudinary
 cloudinary.config({ 
   cloud_name: 'ekei0ke6', 
-  api_key: '133672996317874', 
-  api_secret: 'v8Nn_Ldn_CPtVtc1BZOaFEkvPcY' 
+  api_key: '233723455372952', 
+  api_secret: '7FZy1NaJzFcbrtKHAYknwNoFVto' 
 });
 
 // Use memory storage for Vercel Serverless
