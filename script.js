@@ -426,6 +426,8 @@ function submitBooking(event) {
         const ampm = document.getElementById('eventAmPm') ? document.getElementById('eventAmPm').value : '';
         time = `${time} ${ampm}`;
     }
+    const state = document.getElementById('eventState').value;
+    const city = document.getElementById('eventCity').value.trim();
     const location = document.getElementById('eventLocation').value.trim();
     const message = document.getElementById('message').value.trim();
 
@@ -450,12 +452,22 @@ function submitBooking(event) {
         document.getElementById('eventDate').focus();
         return;
     }
-    if (new Date(date) < new Date()) {
+    if (new Date(date) < new Date(new Date().setHours(0,0,0,0))) {
         showToast('❌ Aaj ya iske baad ki date chunein!', 'error');
         return;
     }
-    if (!location || location.length < 3) {
-        showToast('❌ Event ka location darj karein!', 'error');
+    if (!state) {
+        showToast('❌ State select karein!', 'error');
+        document.getElementById('eventState').focus();
+        return;
+    }
+    if (!city || city.length < 2) {
+        showToast('❌ City darj karein!', 'error');
+        document.getElementById('eventCity').focus();
+        return;
+    }
+    if (!location || location.length < 5) {
+        showToast('❌ Event ka pura pata (Address) darj karein!', 'error');
         document.getElementById('eventLocation').focus();
         return;
     }
@@ -480,7 +492,8 @@ function submitBooking(event) {
             `🎵 *Service:* ${service}\n` +
             `📅 *तारीख:* ${dateFormatted}\n` +
             `⏰ *समय:* ${time || 'बाद में तय होगा'}\n` +
-            `📍 *स्थान:* ${location}\n` +
+            `📍 *शहर/राज्य:* ${city}, ${state}\n` +
+            `🏠 *पूरा पता:* ${location}\n` +
             `💬 *Message:* ${message || 'कोई विशेष अनुरोध नहीं'}\n` +
             `━━━━━━━━━━━━━━━━━━\n` +
             `🙏 Hum jald sampark karenge!`
@@ -793,7 +806,7 @@ console.log('%cPushpendra Madhosh | Sankirtan Booking Website v2.0', 'color: #FF
 
 // --- 3. FORM PROGRESS TRACKER ---
 (function initFormProgress() {
-    const fields = ['clientName', 'clientPhone', 'serviceType', 'eventDate', 'eventLocation'];
+    const fields = ['clientName', 'clientPhone', 'serviceType', 'eventDate', 'eventState', 'eventCity', 'eventLocation'];
     const progressFill = document.getElementById('formProgressFill');
     const progressText = document.getElementById('formProgressText');
     
