@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Pushpendra Madhosh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --maroon: #8B0000;
+            --maroon-dark: #3F000F;
+            --gold: #FFD700;
+            --dark-bg: #1A0006;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark-bg);
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .admin-card {
+            background: var(--maroon-dark);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,215,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: var(--gold);
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ddd;
+            font-size: 0.9rem;
+        }
+        input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+        }
+        input[type="file"] {
+            padding: 9px;
+            cursor: pointer;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #ff8c00, #ffb300);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .upload-section {
+            display: none;
+        }
+        .message {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #4ade80;
+        }
+        .error {
+            color: #f87171;
+        }
+        #logoutBtn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            margin-top: 15px;
+        }
+        /* Manager Grid */
+        .manager-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .manager-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255,215,0,0.3);
+            aspect-ratio: 1;
+        }
+        .manager-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            padding: 0;
+        }
+        .delete-btn:hover {
+            background: red;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-card" id="loginCard">
+        <h2><i class="fas fa-lock"></i> Admin Login</h2>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="passwordInput" placeholder="Enter password...">
+        </div>
+        <button onclick="login()"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <div id="loginMsg" class="message error"></div>
+    </div>
+
+    <div class="admin-card upload-section" id="uploadCard">
+        <h2><i class="fas fa-upload"></i> Upload Gallery Photo</h2>
+        <div class="form-group">
+            <label>Select Photo</label>
+            <input type="file" id="photoInput" accept="image/*">
+        </div>
+        <button onclick="uploadPhoto()"><i class="fas fa-cloud-upload-alt"></i> Upload to Gallery</button>
+        <div id="uploadMsg" class="message"></div>
+        
+        <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
+        
+        <h2><i class="fas fa-images"></i> Manage Photos</h2>
+        <button onclick="loadManagerGallery()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold);"><i class="fas fa-sync"></i> Load Gallery</button>
+        
+        <div class="manager-grid" id="managerGrid">
+            <!-- Images will load here -->
+        </div>
+
+        <button id="logoutBtn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <div style="margin-top: 20px; font-size: 0.85rem;">
+            <a href="index.html" style="color: var(--gold); text-decoration: none;">View Website <i class="fas fa-external-link-alt"></i></a>
+        </div>
+    </div>
+
+    <script>
+        let adminToken = sessionStorage.getItem('adminToken');
+
+        // Check if already logged in
+        if (adminToken) {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('uploadCard').style.display = 'block';
+            loadManagerGallery();
+        }
+
+        function login() {
+            const pass = document.getElementById('passwordInput').value;
+            if(pass === 'SITARAM SITARAM 112233') { // Simple check to match server logic
+                adminToken = pass;
+                sessionStorage.setItem('adminToken', pass);
+                document.getElementById('loginCard').style.display = 'none';
+                document.getElementById('uploadCard').style.display = 'block';
+                loadManagerGallery();
+            } else {
+                document.getElementById('loginMsg').innerText = '❌ Incorrect Password!';
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('adminToken');
+            location.reload();
+        }
+
+        async function uploadPhoto() {
+            const fileInput = document.getElementById('photoInput');
+            const msgBox = document.getElementById('uploadMsg');
+            
+            if (fileInput.files.length === 0) {
+                msgBox.className = 'message error';
+                msgBox.innerText = '❌ Please select a photo first!';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('photo', fileInput.files[0]);
+
+            msgBox.className = 'message';
+            msgBox.style.color = '#FFD700';
+            msgBox.innerText = '⏳ Uploading...';
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': adminToken },
+                    body: formData
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    msgBox.className = 'message';
+                    msgBox.style.color = '#4ade80';
+                    msgBox.innerText = '✅ ' + data.message;
+                    fileInput.value = ''; // clear input
+                    loadManagerGallery(); // Refresh the gallery
+                } else {
+                    msgBox.className = 'message error';
+                    msgBox.innerText = '❌ ' + data.error;
+                }
+            } catch (err) {
+                msgBox.className = 'message error';
+                msgBox.innerText = '❌ Server connection failed!';
+            }
+        }
+
+        async function loadManagerGallery() {
+            const grid = document.getElementById('managerGrid');
+            grid.innerHTML = '<p style="color:#aaa; font-size:0.9rem;">Loading...</p>';
+            
+            try {
+                const response = await fetch('/api/gallery');
+                const images = await response.json();
+                
+                grid.innerHTML = '';
+                if(images.length === 0) {
+                    grid.innerHTML = '<p style="color:#aaa; font-size:0.9rem;">No photos found.</p>';
+                    return;
+                }
+
+                images.forEach(imgPath => {
+                    const filename = imgPath.split('/').pop();
+                    grid.innerHTML += `
+                        <div class="manager-item">
+                            <img src="${imgPath}" alt="Gallery Image">
+                            <button class="delete-btn" onclick="deletePhoto('${filename}')" title="Delete Photo">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                grid.innerHTML = '<p class="error">Failed to load gallery.</p>';
+            }
+        }
+
+        async function deletePhoto(filename) {
+            if(!confirm('Are you sure you want to delete this photo?')) return;
+
+            try {
+                const response = await fetch('/api/gallery/' + filename, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': adminToken }
+                });
+                const data = await response.json();
+                if(response.ok) {
+                    alert('✅ Photo deleted!');
+                    loadManagerGallery(); // refresh
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            } catch(err) {
+                alert('❌ Server connection failed!');
+            }
+        }
+    </script>
+</body>
+</html>

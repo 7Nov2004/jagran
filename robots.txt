@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Disallow access to backend and uploads if necessary
+Disallow: /admin.html
+Disallow: /api/
+
+Sitemap: https://pushpendramadhosh.com/sitemap.xml
