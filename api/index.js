@@ -12,12 +12,12 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from the root directory
-app.use(express.static(__dirname));
+// Static files are handled natively by Vercel, no need for express.static
 
 // Set up Multer storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const dir = path.join(__dirname, 'uploads', 'gallery');
+        const dir = path.join('/tmp', 'uploads', 'gallery');
         if (!fs.existsSync(dir)){
             fs.mkdirSync(dir, { recursive: true });
         }
@@ -44,7 +44,7 @@ const checkAuth = (req, res, next) => {
 
 // API Endpoint to get all gallery images
 app.get('/api/gallery', (req, res) => {
-    const dir = path.join(__dirname, 'uploads', 'gallery');
+    const dir = path.join('/tmp', 'uploads', 'gallery');
     if (!fs.existsSync(dir)) {
         return res.json([]);
     }
@@ -77,7 +77,7 @@ app.delete('/api/gallery/:filename', checkAuth, (req, res) => {
         return res.status(400).json({ error: 'Invalid filename' });
     }
     
-    const filePath = path.join(__dirname, 'uploads', 'gallery', filename);
+    const filePath = path.join('/tmp', 'uploads', 'gallery', filename);
     if (fs.existsSync(filePath)) {
         try {
             fs.unlinkSync(filePath);
