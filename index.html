@@ -630,6 +630,9 @@
             <div class="rating-big">4.9</div>
             <div class="rating-stars-big">⭐⭐⭐⭐⭐</div>
             <div class="rating-count">1000+ Happy Families</div>
+            <button class="btn-primary" onclick="openReviewModal()" style="margin-top: 15px; background: var(--secondary-color);">
+                <i class="fas fa-star"></i> अपनी राय दें (Rate Us)
+            </button>
         </div>
         <div class="reviews-carousel-wrapper">
             <div class="reviews-grid" id="reviewsCarousel">
@@ -1061,6 +1064,43 @@
         <button onclick="closeModal()" class="btn-primary">ठीक है</button>
     </div>
 </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="modal-close" onclick="closeReviewModal()" style="position: absolute; right: 15px; top: 15px; background: transparent; border: none; font-size: 1.5rem; color: #fff; cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 style="color: white; margin-bottom: 5px; font-family: 'Khand', sans-serif; font-size: 1.8rem; text-align: center;">आपकी राय महत्वपूर्ण है</h3>
+            <p style="color: #aaa; margin-bottom: 20px; font-size: 0.9rem; text-align: center;">अपना अनुभव साझा करें (Share your experience)</p>
+            
+            <div class="form-group" style="text-align: center; margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 10px;">रेटिंग दें (Rate Us) *</label>
+                <div class="star-rating-input" id="starRatingInput" style="font-size: 2rem; color: #555; cursor: pointer; display: flex; justify-content: center; gap: 10px;">
+                    <i class="fas fa-star" data-val="1"></i>
+                    <i class="fas fa-star" data-val="2"></i>
+                    <i class="fas fa-star" data-val="3"></i>
+                    <i class="fas fa-star" data-val="4"></i>
+                    <i class="fas fa-star" data-val="5"></i>
+                </div>
+                <input type="hidden" id="reviewRatingVal" value="0">
+            </div>
+
+            <div class="form-group">
+                <label for="reviewName">आपका नाम / Name *</label>
+                <input type="text" id="reviewName" placeholder="अपना नाम लिखें..." required>
+            </div>
+            
+            <div class="form-group">
+                <label for="reviewText">अनुभव / Review *</label>
+                <textarea id="reviewText" rows="4" placeholder="कार्यक्रम का अनुभव कैसा रहा? (How was the experience?)" required></textarea>
+            </div>
+            
+            <button class="btn-primary full-width" onclick="submitReview()">
+                <i class="fas fa-paper-plane"></i> Submit Review
+            </button>
+        </div>
+    </div>
 
 <script src="script.js"></script>
 </body>

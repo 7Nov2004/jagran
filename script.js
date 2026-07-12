@@ -997,3 +997,79 @@ async function loadDynamicGallery() {
 document.addEventListener('DOMContentLoaded', () => {
     loadDynamicGallery();
 });
+
+// --- REVIEW MODAL LOGIC ---
+function openReviewModal() {
+    document.getElementById('reviewModal').style.display = 'flex';
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModal').style.display = 'none';
+}
+
+// Star rating selection
+document.addEventListener('DOMContentLoaded', () => {
+    const starIcons = document.querySelectorAll('#starRatingInput i');
+    const ratingInput = document.getElementById('reviewRatingVal');
+
+    if(starIcons.length > 0) {
+        starIcons.forEach(star => {
+            star.addEventListener('click', function() {
+                const val = this.getAttribute('data-val');
+                ratingInput.value = val;
+                
+                starIcons.forEach(s => {
+                    if (s.getAttribute('data-val') <= val) {
+                        s.style.color = 'var(--secondary-color)';
+                    } else {
+                        s.style.color = '#555';
+                    }
+                });
+            });
+        });
+    }
+});
+
+function submitReview() {
+    const name = document.getElementById('reviewName').value.trim();
+    const rating = document.getElementById('reviewRatingVal').value;
+    const text = document.getElementById('reviewText').value.trim();
+    
+    if (rating === '0') {
+        showToast('❌ कृपया रेटिंग दें (Select stars)', 'error');
+        return;
+    }
+    if (!name || name.length < 2) {
+        showToast('❌ कृपया अपना नाम लिखें', 'error');
+        document.getElementById('reviewName').focus();
+        return;
+    }
+    if (!text || text.length < 3) {
+        showToast('❌ कृपया अपना अनुभव लिखें', 'error');
+        document.getElementById('reviewText').focus();
+        return;
+    }
+    
+    let stars = '';
+    for(let i=0; i<parseInt(rating); i++) stars += '⭐';
+    
+    const waMessage = encodeURIComponent(
+        `🙏 *New Client Review / Rating!* 🙏\n\n` +
+        `👤 *नाम:* ${name}\n` +
+        `🌟 *Rating:* ${stars} (${rating}/5)\n` +
+        `💬 *Review:* ${text}\n`
+    );
+    
+    window.open(`https://wa.me/918742971542?text=${waMessage}`, '_blank');
+    closeReviewModal();
+    
+    // reset form
+    document.getElementById('reviewName').value = '';
+    document.getElementById('reviewText').value = '';
+    document.getElementById('reviewRatingVal').value = '0';
+    document.querySelectorAll('#starRatingInput i').forEach(s => s.style.color = '#555');
+    
+    setTimeout(() => {
+        showToast('✅ आपकी राय सफलता पूर्वक भेज दी गई है! धन्यवाद।', 'success');
+    }, 1000);
+}
