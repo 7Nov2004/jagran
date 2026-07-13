@@ -2163,13 +2163,15 @@ body {
 }
 
 .date-checker-card::before {
-    content: 'ðŸ“…';
+    content: '📅';
     position: absolute;
     right: -20px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 8rem;
     opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .date-checker-left {
@@ -2195,6 +2197,8 @@ body {
     gap: 12px;
     align-items: center;
     flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
 }
 
 .dc-input {
